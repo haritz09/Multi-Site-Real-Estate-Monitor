@@ -1,0 +1,16 @@
+{
+  "name": "proyecto_iparralde",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scrape_iparralde.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright": "^1.58.2"
+  }
+}

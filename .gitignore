@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Playwright local artifacts
+.playwright-mcp/
+playwright-report/
+test-results/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Generated scraper outputs
+iparralde_hendaye_pisos.json
+inmuebles_hendaye.json
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/settings.json
