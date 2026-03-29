@@ -1,11 +1,19 @@
 [
   {
+    "id": "2fca659638271735",
+    "title": "Villa señorial en Hendaya – Zona de standing de Lissardy",
+    "price": "748.900,00 EUR",
+    "location": "64700 Hendaye, FR",
+    "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/770",
+    "scraped_at": "2026-03-29T18:53:16.254Z"
+  },
+  {
     "id": "b8da0d85a2fe6d40",
     "title": "Elegante propiedad completamente reformada – Orientación sur – Vistas a la montaña – Piscina climatizada",
     "price": "898.000,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/810",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "2ebdae318e3a920f",
@@ -13,7 +21,7 @@
     "price": "249.500,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/809",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "fc518013dc002af9",
@@ -21,7 +29,7 @@
     "price": "223.000,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/785",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "fa4d204eb5bac0d6",
@@ -29,7 +37,7 @@
     "price": "451.000,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/799",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "f3fc92852c8a300b",
@@ -37,7 +45,7 @@
     "price": null,
     "location": "31790 Arantza, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/791",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "3a10f06620a56ac9",
@@ -45,15 +53,15 @@
     "price": "510.000,00 EUR",
     "location": "20302 Irun, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/808",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "1a5d492b542f2b57",
     "title": "Vivienda totalmente reformada en la Avenida de Navarra",
-    "price": "328.000,00 EUR",
+    "price": null,
     "location": "20302 Irun, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/807",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "daadf5dbf2739977",
@@ -61,7 +69,7 @@
     "price": "209.500,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/806",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "9ca93dfc8cfdb56f",
@@ -69,7 +77,7 @@
     "price": "209.500,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/804",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "7980b1e17e13d9b6",
@@ -77,15 +85,7 @@
     "price": "498.900,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/805",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
-  },
-  {
-    "id": "2fca659638271735",
-    "title": "Villa señorial en Hendaya – Zona de standing de Lissardy",
-    "price": "748.900,00 EUR",
-    "location": "64700 Hendaye, FR",
-    "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/770",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "0e283b5b9ed14b79",
@@ -93,7 +93,7 @@
     "price": "315.000,00 EUR",
     "location": "20305 Irun, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/803",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "e21081c65529a0d0",
@@ -101,7 +101,7 @@
     "price": null,
     "location": "20304 Irun, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/801",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "452b2d6cb3785bc8",
@@ -109,7 +109,7 @@
     "price": null,
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/802",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "f573ad10d93b245a",
@@ -117,7 +117,7 @@
     "price": null,
     "location": "20302 Irun, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/692",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "7384abfeb16a48fc",
@@ -125,7 +125,7 @@
     "price": null,
     "location": "20305 Irun, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/789",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "403500b02c207d2a",
@@ -133,7 +133,7 @@
     "price": "688.500,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/800",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "1d73cead8380c0f6",
@@ -141,7 +141,7 @@
     "price": "479.000,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/758",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "76edc3dbcb0b83cc",
@@ -149,7 +149,7 @@
     "price": null,
     "location": "20302 Irun, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/726",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "c69a7c1a272909db",
@@ -157,7 +157,7 @@
     "price": "410.000,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/798",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "03f2b5fe221031f5",
@@ -165,7 +165,7 @@
     "price": "423.250,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/797",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "6a561141cfcdd3b5",
@@ -173,7 +173,7 @@
     "price": "367.500,00 EUR",
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/795",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "59e5953b8f842813",
@@ -181,7 +181,7 @@
     "price": null,
     "location": "20302 Irun, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/709",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "817757c59602434a",
@@ -189,7 +189,7 @@
     "price": null,
     "location": "20304 Irun, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/781",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "7c375a10e96f34b8",
@@ -197,7 +197,7 @@
     "price": null,
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/792",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "050064c3eca7ec83",
@@ -205,7 +205,7 @@
     "price": null,
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/786",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "8277a45283c6cfea",
@@ -213,7 +213,7 @@
     "price": null,
     "location": "65200 Bagnères-de-Bigorre, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/773",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "e5bcd098e95c77f1",
@@ -221,7 +221,7 @@
     "price": null,
     "location": "20305 Irun, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/763",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "c4865d6c5da3a7e8",
@@ -229,7 +229,7 @@
     "price": null,
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/760",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "fcd9d2f4dd1afaad",
@@ -237,7 +237,7 @@
     "price": null,
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/686",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "c6668d617a956798",
@@ -245,7 +245,7 @@
     "price": null,
     "location": "64700 Hendaye, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/752",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "20233a149a4b46c5",
@@ -253,7 +253,7 @@
     "price": "295.000,00 EUR",
     "location": "64200 Arcangues, FR",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/725",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   },
   {
     "id": "a31f6e7606cef4f1",
@@ -261,6 +261,6 @@
     "price": "16.000,00 EUR",
     "location": "20304 Irun, ES",
     "detail_url": "https://inmobiliariaiparralde.com/inmuebles/inmueble_detalles/635",
-    "scraped_at": "2026-03-26T18:42:45.312Z"
+    "scraped_at": "2026-03-29T18:53:16.254Z"
   }
 ]
