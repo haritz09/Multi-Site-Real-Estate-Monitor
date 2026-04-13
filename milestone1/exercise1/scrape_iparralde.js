@@ -98,12 +98,25 @@ function inferLocationFromTitle(title) {
 
                         const title = (titleAnchor?.textContent || detailAnchor.textContent || '').replace(/\s+/g, ' ').trim();
                         const priceNode = card.querySelector('.price, .precio, [class*="price"], [class*="precio"]');
-                        const locationNode = card.querySelector('.location, .direccion, .address, .poblacion');
+
+                        // Prefer addresses like "64700 Hendaye, FR" over descriptive text.
+                        const textCandidates = [
+                            ...Array.from(card.querySelectorAll('p, span, small, li')).map((el) => (el.textContent || '').replace(/\s+/g, ' ').trim()),
+                            (card.textContent || '').replace(/\s+/g, ' ').trim(),
+                        ].filter(Boolean);
+
+                        const addressRegex = /\b\d{5}\s+[A-Za-zÀ-ÿ'\- ]+,\s*[A-Z]{2}\b/;
+                        const matchedAddress = textCandidates
+                            .map((txt) => {
+                                const match = txt.match(addressRegex);
+                                return match ? match[0].trim() : null;
+                            })
+                            .find(Boolean);
 
                         return {
                             title,
                             price: priceNode ? priceNode.textContent.replace(/\s+/g, ' ').trim() : null,
-                            location: locationNode ? locationNode.textContent.replace(/\s+/g, ' ').trim() : null,
+                            location: matchedAddress || null,
                             detailUrl,
                             scrapedAt: timestamp,
                         };
@@ -141,7 +154,7 @@ function inferLocationFromTitle(title) {
                         id,
                         title: normalizeWhitespace(row.title),
                         price: row.price ? normalizeWhitespace(row.price) : null,
-                        location: row.location ? normalizeWhitespace(row.location) : inferLocationFromTitle(normalizeWhitespace(row.title)),
+                        location: row.location ? normalizeWhitespace(row.location) : null,
                         detailUrl: row.detailUrl,
                         scrapedAt: row.scrapedAt,
                     });

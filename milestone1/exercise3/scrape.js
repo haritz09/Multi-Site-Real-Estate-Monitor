@@ -159,22 +159,32 @@ async function scrape() {
     let allResults = [];
     const extractEval = `
         Array.from(document.querySelectorAll('div.col-sm-9 h3')).map(h3 => {
-            const grandpa = h3.parentElement?.parentElement?.parentElement;
-            const fullText = grandpa?.innerText;
-            const lines = fullText ? fullText.split(/\\r?\\n/).map(l => l.trim()).filter(Boolean) : [];
-            const price = lines.find(l => l.match(/€/)) || lines.find(l => l.toLowerCase().includes('precio consultar')) || 'N/A';
-            const loc = lines.find(l => l.match(/\\d{5}/)) || 'N/A';
-            const url = h3.parentElement?.href;
+            const container = h3.closest('.property-list-list') || h3.parentElement?.parentElement?.parentElement;
+            const fullText = (container?.innerText || '').replace(/\\s+/g, ' ').trim();
+
+            const linkNode = h3.querySelector('a') || h3.parentElement;
+            const url = linkNode?.href || null;
+
+            const addressRegex = /\\b\\d{5}\\s+[A-Za-zÀ-ÿ'\\- ]+,\\s*[A-Z]{2}\\b/;
+            const locMatch = fullText.match(addressRegex);
+            const loc = locMatch ? locMatch[0].trim() : 'N/A';
+
+            const priceRegex = /\\d{1,3}(?:[.,]\\d{3})*(?:,\\d{2})?\\s*€/;
+            const priceMatch = fullText.match(priceRegex);
+            const price = priceMatch
+                ? priceMatch[0].trim()
+                : (fullText.toLowerCase().includes('precio consultar') ? 'Precio consultar' : 'N/A');
+
             return {
-                title: h3.innerText.trim(),
-                price: price,
+                title: (h3.innerText || '').trim(),
+                price,
                 location: loc,
-                url: url,
+                url,
                 id: url ? url.split('/').pop() : null,
                 timestamp: new Date().toISOString()
             };
-        })
-    `.replace(/\n/g, ' ');
+        }).filter(item => item.id && item.title)
+    `.replace(/\\n/g, ' ');
 
     let currentPage = 1;
     let hasNextPage = true;
