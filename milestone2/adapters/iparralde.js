@@ -38,101 +38,88 @@ class IparraldeAdapter {
         const page = await context.newPage();
 
         const resultsById = new Map();
-        const visitedPageKeys = new Set();
         const maxPages = Number.isInteger(params.maxPages) && params.maxPages > 0 ? params.maxPages : 10;
 
         try {
-            await page.goto('https://inmobiliariaiparralde.com/', { waitUntil: 'domcontentloaded' });
+            console.error(`[${this.siteId}] Navegando a inmobiliariaiparralde.com...`);
+            await page.goto('https://inmobiliariaiparralde.com/', { waitUntil: 'networkidle' });
 
-            await page.evaluate((filters) => {
-                const form = document.querySelector('form.findus');
-                if (!form) throw new Error('No se encontro el formulario principal.');
+            console.error(`[${this.siteId}] Aplicando filtros y buscando (Comprar, Piso, Hendaye)...`);
+            await page.goto('https://inmobiliariaiparralde.com', { waitUntil: 'load' });
 
-                const modalidad = form.querySelector('input[name="modalidad"]');
-                if (modalidad) modalidad.value = 'alquiler';
+            try { await page.locator('text=ACEPTAR COOKIES').click({ timeout: 2000 }); } catch (e) {}
 
-                const tipo = form.querySelector('select[name="tipoInmueble[]"]');
-                if (tipo) tipo.value = filters.propertyType || 'piso';
+            await Promise.all([
+                page.waitForNavigation({ waitUntil: 'load', timeout: 30000 }),
+                page.locator('.nav-tabs a').filter({ hasText: 'Comprar' }).first().click()
+            ]);
 
-                const municipio = form.querySelector('select[name="municipio[]"]');
-                if (municipio && filters.municipality) municipio.value = filters.municipality;
+            const activeTab = page.locator('.tab-content .active form.findus').first();
+            await activeTab.locator('select[name="tipoInmueble[]"]').selectOption({ label: 'Piso' });
+            await activeTab.locator('select[name="municipio[]"]').selectOption({ label: 'Hendaye' });
 
-                const ref = form.querySelector('input[name="ref"]');
-                if (ref) ref.value = '';
+            await page.waitForTimeout(500);
 
-                form.submit();
-            }, params.filters || {});
+            await Promise.all([
+                page.waitForNavigation({ waitUntil: 'load', timeout: 30000 }),
+                activeTab.locator('button.submit, .query-submit-button button, button[type="submit"]').first().click()
+            ]);
 
-            await page.waitForURL('**/inmuebles/listado_de_inmuebles**', { timeout: 30000 });
+            await page.waitForTimeout(2000);
             await page.waitForLoadState('networkidle');
 
-            for (let pageIndex = 1; pageIndex <= maxPages; pageIndex += 1) {
-                await page.waitForLoadState('domcontentloaded');
-                await page.waitForTimeout(500);
+            const extractVisiblePage = async () => {
+                await page.waitForSelector('.row.contratos-venta .col-md-8 a[href*="inmueble_detalles"]', { timeout: 10000 });
 
-                const pageData = await page.evaluate(() => {
+                return page.evaluate(() => {
                     const timestamp = new Date().toISOString();
-                    const cards = Array.from(document.querySelectorAll('.item'));
+                    const anchors = Array.from(document.querySelectorAll('.row.contratos-venta .col-md-8 a[href*="inmueble_detalles"]'));
+                    const byUrl = new Map();
 
-                    const extracted = cards
-                        .map((card) => {
-                            const detailAnchor = card.querySelector('a[href*="/inmuebles/inmueble_detalles/"]');
-                            if (!detailAnchor) return null;
+                    const clean = (str) => (str || '').replace(/\s+/g, ' ').trim();
+                    const isGenericLinkText = (str) => /^ver\s+detalles?$/i.test(clean(str));
 
-                            const detailUrl = detailAnchor.href;
-                            const titleAnchor = card.querySelector('h2 a, h3 a, h4 a');
+                    for (const anchor of anchors) {
+                        const detailUrl = anchor.href;
+                        if (!detailUrl) continue;
 
-                            const title = (titleAnchor?.textContent || detailAnchor.textContent || '').replace(/\s+/g, ' ').trim();
-                            const priceNode = card.querySelector('.price, .precio, [class*="price"], [class*="precio"]');
+                        const card = anchor.closest('.property-list-list') || anchor.closest('.row') || anchor.parentElement;
+                        const text = clean(card?.textContent || anchor.textContent || '');
 
-                            // Prefer real postal address lines like "64700 Hendaye, FR".
-                            const textCandidates = [
-                                ...Array.from(card.querySelectorAll('p, span, small, li')).map((el) => (el.textContent || '').replace(/\s+/g, ' ').trim()),
-                                (card.textContent || '').replace(/\s+/g, ' ').trim(),
-                            ].filter(Boolean);
+                        const preferredTitle = clean(card?.querySelector('h4 a[href*="inmueble_detalles"], h4 a, h3 a, h2 a')?.textContent || '');
+                        const anchorText = clean(anchor.textContent || '');
+                        const bestTitleCandidate = preferredTitle || (!isGenericLinkText(anchorText) ? anchorText : '');
 
-                            const addressRegex = /\b\d{5}\s+[A-Za-zÀ-ÿ'\- ]+,\s*[A-Z]{2}\b/;
-                            const matchedAddress = textCandidates
-                                .map((txt) => {
-                                    const match = txt.match(addressRegex);
-                                    return match ? match[0].trim() : null;
-                                })
-                                .find(Boolean);
+                        const priceMatch = text.match(/\d{1,3}(?:\.\d{3})*(?:,\d{2})?\s*€/);
+                        const addressMatch = text.match(/\b\d{5}\s+[A-Za-zÀ-ÿ'\- ]+,\s*[A-Z]{2}\b/);
 
-                            const locationNode = card.querySelector('.location, .direccion, .address, .poblacion');
-                            const locationValue = matchedAddress || (locationNode ? locationNode.textContent.replace(/\s+/g, ' ').trim() : null);
+                        const existing = byUrl.get(detailUrl) || {
+                            title: '',
+                            price: null,
+                            location: null,
+                            detailUrl,
+                            scrapedAt: timestamp,
+                        };
 
-                            return {
-                                title,
-                                price: priceNode ? priceNode.textContent.replace(/\s+/g, ' ').trim() : null,
-                                location: locationValue,
-                                detailUrl,
-                                scrapedAt: timestamp,
-                            };
-                        })
-                        .filter((x) => x && x.detailUrl && x.title);
+                        if (!existing.title && bestTitleCandidate) {
+                            existing.title = bestTitleCandidate;
+                        }
+                        if (!existing.price && priceMatch) {
+                            existing.price = priceMatch[0].trim();
+                        }
+                        if (!existing.location && addressMatch) {
+                            existing.location = addressMatch[0].trim();
+                        }
 
-                    const nextPageLink = document.querySelector('.pagination a[rel="next"], .pagination-next a, a.next');
-                    const nextPageUrl = nextPageLink ? nextPageLink.href : null;
-                    const pageKey = `${location.pathname}${location.search}::${extracted.length}`;
+                        byUrl.set(detailUrl, existing);
+                    }
 
-                    return {
-                        extracted,
-                        pageKey,
-                        nextPageUrl,
-                    };
+                    return Array.from(byUrl.values()).filter((x) => x && x.detailUrl && x.title);
                 });
+            };
 
-                if (visitedPageKeys.has(pageData.pageKey)) {
-                    break;
-                }
-                visitedPageKeys.add(pageData.pageKey);
-
-                if (pageData.extracted.length === 0) {
-                    break;
-                }
-
-                for (const row of pageData.extracted) {
+            const mergeRows = (rows) => {
+                for (const row of rows) {
                     const id = extractStableIdFromUrl(row.detailUrl);
                     if (!id || resultsById.has(id)) continue;
 
@@ -146,12 +133,24 @@ class IparraldeAdapter {
                         scrapedAt: row.scrapedAt,
                     });
                 }
+            };
 
-                if (!pageData.nextPageUrl || pageIndex >= maxPages) {
-                    break;
-                }
+            mergeRows(await extractVisiblePage());
 
-                await page.goto(pageData.nextPageUrl, { waitUntil: 'domcontentloaded' });
+            const pageRefs = await page.locator('a.page[href^="#page:"]').evaluateAll((anchors) => {
+                const hrefs = anchors
+                    .map((a) => (a.getAttribute('href') || '').trim())
+                    .filter((h) => /^#page:\d+$/i.test(h));
+
+                return Array.from(new Set(hrefs));
+            });
+
+            for (const ref of pageRefs.slice(0, maxPages)) {
+                if (ref === '#page:1') continue;
+                const pageLink = page.locator(`a.page[href="${ref}"]`).first();
+                await pageLink.click({ timeout: 10000 });
+                await page.waitForTimeout(1000);
+                mergeRows(await extractVisiblePage());
             }
         } finally {
             await browser.close();
