@@ -26,6 +26,7 @@ function parseArgs(argv) {
         healthPort: getValue('--health-port'),
         immediate: args.includes('--immediate'),
         dashboard: args.includes('--dashboard'),
+        status: args.includes('--status'),
         port: getValue('--port'),
         help: args.includes('--help')
     };
@@ -45,6 +46,8 @@ function usage() {
         '  --out <file>      Guarda resultados crudos por sitio en JSON',
         '  --health-port <n> Activa health-check HTTP en ese puerto',
         '  --immediate       En modo schedule, ejecuta una corrida inmediata al arrancar',
+        '  --dashboard       Arranca el panel web',
+        '  --status          Muestra el estado de la base de datos',
         '  --help            Muestra esta ayuda'
     ].join('\n');
 }
@@ -246,6 +249,31 @@ async function main() {
     if (args.help) {
         console.log(usage());
         process.exit(0);
+    }
+
+    if (args.status) {
+        try {
+            const dbCtx = dbModule.openDb();
+            const db = dbCtx.db;
+            const totalRes = await db.execute('SELECT COUNT(*) as cuenta FROM listings_current WHERE active = 1');
+            const total = totalRes.rows[0].cuenta;
+            
+            const bySiteRes = await db.execute('SELECT siteId, COUNT(*) as cuenta FROM listings_current WHERE active = 1 GROUP BY siteId');
+            
+            const dbName = dbCtx.resolvedPath.includes('turso') ? 'Turso (libsql)' : (dbCtx.resolvedPath.includes('sqlite') ? 'SQLite' : 'libsql');
+
+            console.log(`Total listings: ${total}`);
+            console.log(`  Database: ${dbName}`);
+            console.log(`  By site:`);
+            bySiteRes.rows.forEach(r => {
+                console.log(`    ${r.siteId}: ${r.cuenta} listings`);
+            });
+            console.log();
+            process.exit(0);
+        } catch (err) {
+            console.error(`Error de estado: ${err.message}`);
+            process.exit(1);
+        }
     }
 
     if (args.dashboard) {
