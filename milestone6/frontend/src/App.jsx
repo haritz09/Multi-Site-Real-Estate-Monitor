@@ -1,8 +1,110 @@
 import { useState, useEffect } from 'react'
+
+const FAVORITES_STORAGE_KEY = 'iparralde-favorites';
+
+function readFavoritesFromStorage() {
+  try {
+    const raw = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeFavoritesToStorage(favorites) {
+  localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+}
+
+function Sparkline({ points, fallbackPrice }) {
+  const safePoints = Array.isArray(points)
+    ? points.filter((p) => Number.isFinite(Number(p?.price))).map((p) => Number(p.price))
+    : [];
+
+  // If there is no historical change yet, use current listing price so we still render a meaningful mini-chart.
+  const values = safePoints.length > 0
+    ? safePoints
+    : (Number.isFinite(fallbackPrice) && fallbackPrice > 0 ? [fallbackPrice] : []);
+
+  if (values.length === 0) {
+    return <span style={{ fontSize: '0.75rem' }}>-</span>;
+  }
+
+  // Duplicate single-point series to avoid rendering only an isolated dot.
+  const series = values.length === 1 ? [values[0], values[0]] : values;
+  let min = Math.min(...series);
+  let max = Math.max(...series);
+
+  // Increase legibility when prices changed very little relative to total value.
+  if (max !== min) {
+    const range = max - min;
+    const minVisualRange = Math.max(max * 0.015, 2500);
+    if (range < minVisualRange) {
+      const mid = (max + min) / 2;
+      min = mid - minVisualRange / 2;
+      max = mid + minVisualRange / 2;
+    }
+  }
+
+  const width = 120;
+  const height = 36;
+  const pad = 4;
+
+  const toX = (idx) => pad + (idx / (series.length - 1)) * (width - pad * 2);
+  const toY = (v) => {
+    if (max === min) return height / 2;
+    return pad + (1 - (v - min) / (max - min)) * (height - pad * 2);
+  };
+
+  const plotPoints = series.map((v, idx) => `${toX(idx)},${toY(v)}`).join(' ');
+  const color = series[series.length - 1] < series[0] ? '#d62828' : 'var(--text-color)';
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} width="120" height="36" aria-label="price-history-sparkline">
+      <line
+        x1={pad}
+        y1={height - pad}
+        x2={width - pad}
+        y2={height - pad}
+        stroke="rgba(0,0,0,0.22)"
+        strokeWidth="1"
+      />
+      <polyline
+        points={plotPoints}
+        fill="none"
+        stroke={color}
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle
+        cx={toX(series.length - 1)}
+        cy={toY(series[series.length - 1])}
+        r="2.6"
+        fill={color}
+      />
+    </svg>
+  );
+}
+
 function App() {
   const [stats, setStats] = useState({ total_active: 0, recent_changes: [], histogram: [] });
   const [listings, setListings] = useState([]);
   const [changes, setChanges] = useState([]);
+  const [priceHistory, setPriceHistory] = useState({});
+  // Favorites are persisted client-side to keep watchlist independent from backend schema.
+  const [favorites, setFavorites] = useState(() => readFavoritesFromStorage());
+
+  // Filters only use fields that already exist in listings_current.
+  const [filters, setFilters] = useState({
+    text: '',
+    site: 'all',
+    minPrice: '',
+    maxPrice: '',
+    favoritesOnly: false
+  });
+
   const [sortConfig, setSortConfig] = useState({ key: 'last_seen', direction: 'desc' });
   const [changesPage, setChangesPage] = useState(1);
 
@@ -14,7 +116,23 @@ function App() {
     fetch('/api/stats').then(r => r.json()).then(setStats).catch(console.error);
     fetch('/api/listings').then(r => r.json()).then(setListings).catch(console.error);
     fetch('/api/changes').then(r => r.json()).then(setChanges).catch(console.error);
+    fetch('/api/history').then(r => r.json()).then(setPriceHistory).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    writeFavoritesToStorage(favorites);
+  }, [favorites]);
+
+  const toggleFavorite = (listingId) => {
+    setFavorites((prev) => prev.includes(listingId)
+      ? prev.filter((id) => id !== listingId)
+      : [...prev, listingId]
+    );
+  };
+
+  const updateFilter = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleSort = (key) => {
     let direction = 'asc';
@@ -22,7 +140,26 @@ function App() {
     setSortConfig({ key, direction });
   };
 
-  const sortedListings = [...listings].sort((a, b) => {
+  const availableSites = [...new Set(listings.map((l) => l.siteId).filter(Boolean))].sort();
+
+  const filteredListings = listings.filter((l) => {
+    const search = filters.text.trim().toLowerCase();
+    const matchesText = !search || [l.title, l.location, l.siteId].some((v) => (v || '').toLowerCase().includes(search));
+    const matchesSite = filters.site === 'all' || l.siteId === filters.site;
+
+    const min = filters.minPrice === '' ? null : Number(filters.minPrice);
+    const max = filters.maxPrice === '' ? null : Number(filters.maxPrice);
+    // DB stores price_num in cents, but filter inputs are in euros.
+    const priceNumEuros = Number(l.price_num || 0) / 100;
+    const matchesMin = min === null || (!Number.isNaN(min) && priceNumEuros >= min);
+    const matchesMax = max === null || (!Number.isNaN(max) && priceNumEuros <= max);
+
+    const matchesFavorites = !filters.favoritesOnly || favorites.includes(l.id);
+
+    return matchesText && matchesSite && matchesMin && matchesMax && matchesFavorites;
+  });
+
+  const sortedListings = [...filteredListings].sort((a, b) => {
     let valA = a[sortConfig.key];
     let valB = b[sortConfig.key];
     if (sortConfig.key === 'price_num') {
@@ -74,24 +211,89 @@ function App() {
       <div className="listing-grid">
         <section className="main-content">
           <h2>[ Active Inventory ]</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: '0.5rem', marginBottom: '1rem' }}>
+            {/* Search uses existing textual fields only (title/location/site). */}
+            <input
+              value={filters.text}
+              onChange={(e) => updateFilter('text', e.target.value)}
+              placeholder="Search title / location / site"
+              style={{ border: '2px solid black', padding: '0.5rem', fontFamily: 'inherit', fontWeight: '700' }}
+            />
+            <input
+              type="number"
+              min="0"
+              value={filters.minPrice}
+              onChange={(e) => updateFilter('minPrice', e.target.value)}
+              placeholder="Min Price"
+              style={{ border: '2px solid black', padding: '0.5rem', fontFamily: 'inherit', fontWeight: '700' }}
+            />
+            <input
+              type="number"
+              min="0"
+              value={filters.maxPrice}
+              onChange={(e) => updateFilter('maxPrice', e.target.value)}
+              placeholder="Max Price"
+              style={{ border: '2px solid black', padding: '0.5rem', fontFamily: 'inherit', fontWeight: '700' }}
+            />
+            <select
+              value={filters.site}
+              onChange={(e) => updateFilter('site', e.target.value)}
+              style={{ border: '2px solid black', padding: '0.5rem', fontFamily: 'inherit', fontWeight: '700', background: 'white' }}
+            >
+              <option value="all">All Sites</option>
+              {availableSites.map((site) => (
+                <option key={site} value={site}>{site}</option>
+              ))}
+            </select>
+            <button
+              onClick={() => updateFilter('favoritesOnly', !filters.favoritesOnly)}
+              style={{
+                border: '2px solid black',
+                padding: '0.5rem 0.7rem',
+                fontFamily: 'inherit',
+                fontWeight: '700',
+                background: filters.favoritesOnly ? 'black' : 'white',
+                color: filters.favoritesOnly ? 'white' : 'black',
+                cursor: 'pointer'
+              }}
+            >
+              ★ Favorites
+            </button>
+          </div>
           <div className="table-wrapper">
             <table>
               <thead>
                 <tr>
+                  <th>Fav</th>
                   <th onClick={() => handleSort('siteId')}>Site {sortConfig.key==='siteId'?(sortConfig.direction==='asc'?'↑':'↓'):''}</th>
                   <th onClick={() => handleSort('title')}>Title {sortConfig.key==='title'?(sortConfig.direction==='asc'?'↑':'↓'):''}</th>
                   <th onClick={() => handleSort('location')}>LOCATION {sortConfig.key==='location'?(sortConfig.direction==='asc'?'↑':'↓'):''}</th>
                   <th onClick={() => handleSort('price_num')}>Price {sortConfig.key==='price_num'?(sortConfig.direction==='asc'?'↑':'↓'):''}</th>
+                  <th>History</th>
                   <th onClick={() => handleSort('first_seen')}>First Seen {sortConfig.key==='first_seen'?(sortConfig.direction==='asc'?'↑':'↓'):''}</th>
                 </tr>
               </thead>
               <tbody>
                 {sortedListings.map(l => (
                   <tr key={l.id}>
+                    <td>
+                      <button
+                        onClick={() => toggleFavorite(l.id)}
+                        style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '1rem' }}
+                        title="Toggle favorite"
+                        aria-label="toggle-favorite"
+                      >
+                        {favorites.includes(l.id) ? '★' : '☆'}
+                      </button>
+                    </td>
                     <td><strong>{l.siteId}</strong></td>
                     <td><a href={l.url} target="_blank" rel="noreferrer" title={l.id}>{l.title}</a></td>
                     <td>{l.location}</td>
                     <td><strong style={{ fontSize: '1.2rem', color: 'var(--accent-color)' }}>{l.price}</strong></td>
+                    <td style={{ minWidth: '130px' }}>
+                      {/* Sparkline shows chronological price evolution from listing_changes. */}
+                      <Sparkline points={priceHistory[l.id] || []} fallbackPrice={Number(l.price_num || 0) / 100} />
+                    </td>
                     <td style={{ fontSize: '0.8rem' }}>{l.first_seen?.split('T')[0]}</td>
                   </tr>
                 ))}
