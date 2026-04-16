@@ -42,9 +42,7 @@ This adapter is responsible for the full data lifecycle of a listing from **Inmo
 
 ## Additional Comments
 - **Frontend Design:** The dashboard's distinctive interface was developed using a frontend-skill available in [.github/skills/frontend-skill/SKILL.md](.github/skills/frontend-skill/SKILL.md). This approach focused on fast implementation and rapid design. 
-The dashboard follows a **Brutalist Minimalist** aesthetic, characterized by high-contrast typography (Space Mono), bold borders, solid shadows, and a raw "terminal-like" structure that prioritizes data visibility over decorative elements.
-
-The dashboard can be improved to be more responsive so it can be accesed from a mobile phone in a comfortable way.
+The dashboard follows a **Brutalist Minimalist** aesthetic, characterized by high-contrast typography (Space Mono), bold borders, solid shadows, and a raw "terminal-like" structure that prioritizes data visibility over decorative elements. The dashboard can be improved to be more responsive so it can be accesed from a mobile phone in a comfortable way.
 
 
 - **Testing Approach:** Since property listings in the target real estate sites do not change frequently, I validated the change detection and notification system through manual data manipulation in the Turso database. By manually modifying listing attributes (prices, active status) in the `listings_current` table, I was able to successfully trigger and verify the logic for price change alerts and property removal notifications. Some tests can be seen in this screenshot:
@@ -72,7 +70,7 @@ Dashboard Overview:
 
 Inventory and recent envents paginated:
 ![Inventory and recent events paginated](screenshots/inventoryandrecentevents.png)
-*Caption: Inventory of houses and recent events paginated  (prices between 200.000 and 700.000).*
+*Caption: Inventory of houses and recent events paginated  (prices between 400.000 and 700.000).*
 
 Filters (Milestone 6 enhancement):
 ![Filters](screenshots/filters.png)
