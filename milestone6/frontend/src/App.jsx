@@ -59,7 +59,9 @@ function App() {
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px', height: '100px' }}>
               {stats.histogram.map(b => (
                 <div key={b.range} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end' }}>
-                  <div style={{ width: '100%', height: `${Math.max((b.count / maxHistogramCount) * 100, 2)}%`, background: 'var(--text-color)', border: '2px solid black', boxSizing: 'border-box' }}></div>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', width: '100%', flex: 1 }}>
+                    <div style={{ width: '100%', height: `${Math.max((b.count / maxHistogramCount) * 100, 2)}%`, background: 'var(--text-color)', border: '2px solid black', boxSizing: 'border-box' }}></div>
+                  </div>
                   <div style={{ fontSize: '0.7rem', marginTop: '5px' }}>{b.range}</div>
                   <div style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>{b.count}</div>
                 </div>
