@@ -107,6 +107,63 @@ fastify.get('/api/stats', async (request, reply) => {
     }
 });
 
+// 4. Per-listing price history for sparkline rendering in frontend
+fastify.get('/api/history', async (request, reply) => {
+    try {
+        const db = getDb();
+        const res = await db.execute(`
+            SELECT listing_id, change_type, diff_json, created_at
+            FROM listing_changes
+            WHERE change_type IN ('new', 'price_changed')
+            ORDER BY created_at ASC
+        `);
+
+        const historyByListing = {};
+        const parsePriceToEuros = (value) => {
+            if (!value) return null;
+            const raw = parseInt(String(value).replace(/[^\d]/g, ''), 10);
+            if (Number.isNaN(raw)) return null;
+            return raw / 100;
+        };
+
+        for (const row of res.rows) {
+            const diff = JSON.parse(row.diff_json || '{}');
+
+            if (!historyByListing[row.listing_id]) {
+                historyByListing[row.listing_id] = [];
+            }
+
+            const series = historyByListing[row.listing_id];
+
+            // For a single price change event, include old->new so sparkline has visible slope.
+            if (row.change_type === 'price_changed') {
+                const oldPrice = parsePriceToEuros(diff.old_price);
+                const newPrice = parsePriceToEuros(diff.new_price);
+                if (oldPrice !== null) {
+                    const last = series[series.length - 1];
+                    if (!last || last.price !== oldPrice) {
+                        series.push({ date: row.created_at, price: oldPrice });
+                    }
+                }
+                if (newPrice !== null) {
+                    series.push({ date: row.created_at, price: newPrice });
+                }
+                continue;
+            }
+
+            const listingPrice = parsePriceToEuros(diff.new_price);
+            if (listingPrice !== null) {
+                series.push({ date: row.created_at, price: listingPrice });
+            }
+        }
+
+        return historyByListing;
+    } catch (e) {
+        console.error(e);
+        return reply.status(500).send({ error: e.message });
+    }
+});
+
 const start = async (overridePort) => {
     const args = process.argv.slice(2);
     const portFlagIdx = args.indexOf('--port');
